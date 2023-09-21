@@ -28,57 +28,60 @@ const secretKey = '123456789'; // Replace with a strong and secret key
   //   the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
 
     /**************************************************************************** */
-
+    app.get( "/filteredimage", async (req, res) => {
+      let image_url = req.query.image_url;
+      let file = await filterImageFromURL(image_url).catch(err => {
+        res.status(404).send("Image Url Not Found");
+      })
+      res.status(200).sendFile(file, () => {
+        deleteLocalFiles([file]);
+      });
+    });
   //! END @TODO1
   
   // Root Endpoint
   // Displays a simple message to the user
-
+  app.get( "/", async (req, res) => {
+    res.send("try GET /filteredimage?image_url={{}}")
+  } );
+  
   
   // app.get( "/", verifyToken , async (req, res) => {
   //   res.send("try GET /filteredimage?image_url={{}}")
   // } );
-  function verifyToken(req, res, next) {
-    const token = req.header('Authorization');
+  // function verifyToken(req, res, next) {
+  //   const token = req.header('Authorization');
   
-    if (!token) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
+  //   if (!token) {
+  //     return res.status(401).json({ message: 'Unauthorized' });
+  //   }
   
-    try {
-      const decoded = jwt.verify(token, secretKey);
-      req.user = decoded;
-      next();
-    } catch (err) {
-      return res.status(401).json({ message: 'Invalid token' });
-    }
-  }
-  app.get( "/filteredimage", verifyToken, async (req, res) => {
-    let image_url = req.query.image_url;
-    let file = await filterImageFromURL(image_url).catch(err => {
-      res.status(404).send("Image Url Not Found");
-    })
-    res.status(200).sendFile(file, () => {
-      deleteLocalFiles([file]);
-    });
-  });
+  //   try {
+  //     const decoded = jwt.verify(token, secretKey);
+  //     req.user = decoded;
+  //     next();
+  //   } catch (err) {
+  //     return res.status(401).json({ message: 'Invalid token' });
+  //   }
+  // }
 
-  app.post('/login', (req, res) => {
-    const { username, password } = req.body;
+
+  // app.post('/login', (req, res) => {
+  //   const { username, password } = req.body;
   
-    // You can replace this with your own authentication logic
-    if (username === 'user' && password === 'password') {
-      const payload = {
-        username: username,
-      };
+  //   // You can replace this with your own authentication logic
+  //   if (username === 'user' && password === 'password') {
+  //     const payload = {
+  //       username: username,
+  //     };
   
-      const token = jwt.sign(payload, secretKey);
+  //     const token = jwt.sign(payload, secretKey);
   
-      res.json({ token });
-    } else {
-      res.status(401).json({ message: 'Authentication failed' });
-    }
-  });
+  //     res.json({ token });
+  //   } else {
+  //     res.status(401).json({ message: 'Authentication failed' });
+  //   }
+  // });
 
 
 
